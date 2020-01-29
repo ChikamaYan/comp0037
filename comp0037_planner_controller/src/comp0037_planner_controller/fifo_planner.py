@@ -12,12 +12,15 @@ class FIFOPlanner(CellBasedForwardSearch):
 
     # Construct the new planner object
     def __init__(self, title, occupancyGrid):
+        self.visit_count = 0
+        self.max_queue_len = 0
         CellBasedForwardSearch.__init__(self, title, occupancyGrid)
         self.fifoQueue = deque()
 
     # Simply put on the end of the queue
     def pushCellOntoQueue(self, cell):
         self.fifoQueue.append(cell)
+        self.max_queue_len = max(self.max_queue_len,len(self.fifoQueue))
 
     # Check the queue size is zero
     def isQueueEmpty(self):
@@ -25,6 +28,7 @@ class FIFOPlanner(CellBasedForwardSearch):
 
     # Simply pull from the front of the list
     def popCellFromQueue(self):
+        self.visit_count +=1
         cell = self.fifoQueue.popleft()
         return cell
 
