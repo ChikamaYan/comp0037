@@ -7,7 +7,7 @@ import map_getter
 import rospy
 
 # Initialise node
-rospy.init_node('fifo_standalone', anonymous=True)
+rospy.init_node('greedy_standalone', anonymous=True)
 
 # Mapgetter  helps load maps off the map server
 mapGetter = map_getter.MapGetter()
