@@ -38,6 +38,9 @@ class GreedyPlanner(CellBasedForwardSearch):
         # Nothing to do in self case
         pass
 
+    def getQueueLen(self):
+        return len(self.priorityQueue)
+
     # computer the heuristic from given cell to goal. Here it would be Euclidean distance
     def computeHeuristic(self,cell):
         return math.sqrt((cell.coords[0] - self.goal.coords[0])**2 + (cell.coords[1] - self.goal.coords[1])**2)

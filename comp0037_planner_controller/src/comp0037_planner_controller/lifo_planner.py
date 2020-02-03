@@ -22,6 +22,9 @@ class LIFOPlanner(CellBasedForwardSearch):
     def popCellFromQueue(self):
         cell = self.lifoQueue.pop()
         return cell
+    
+    def getQueueLen(self):
+        return len(self.lifoQueue)
 
     def resolveDuplicate(self, cell, parentCell):
         # Nothing to do in self case

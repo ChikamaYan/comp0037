@@ -28,6 +28,9 @@ class FIFOPlanner(CellBasedForwardSearch):
         cell = self.fifoQueue.popleft()
         return cell
 
+    def getQueueLen(self):
+        return len(self.fifoQueue)
+
     def resolveDuplicate(self, cell, parentCell):
         # Nothing to do in self case
         pass

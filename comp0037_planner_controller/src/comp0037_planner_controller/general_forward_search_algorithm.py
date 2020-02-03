@@ -36,6 +36,10 @@ class GeneralForwardSearchAlgorithm(PlannerBase):
     def popCellFromQueue(self):
         raise NotImplementedError()
 
+    # Used to get current queue length
+    def getQueueLen(self):
+        raise NotImplementedError()
+
     # This method determines if the goal has been reached.
     def hasGoalBeenReached(self, cell):
         raise NotImplementedError()
@@ -152,7 +156,7 @@ class GeneralForwardSearchAlgorithm(PlannerBase):
                 else:
                     self.resolveDuplicate(nextCell, cell)
                 # update maximum length of queue
-                self.maxQueueLen = max(self.maxQueueLen,len(self.fifoQueue))
+                self.maxQueueLen = max(self.maxQueueLen,self.getQueueLen())
 
             # Now that we've checked all the actions for this cell,
             # mark it as dead
