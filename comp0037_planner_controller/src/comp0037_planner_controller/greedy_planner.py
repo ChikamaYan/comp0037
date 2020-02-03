@@ -11,7 +11,7 @@ class GreedyPlanner(CellBasedForwardSearch):
     # Construct the new planner object
     def __init__(self, title, occupancyGrid):
         CellBasedForwardSearch.__init__(self, title, occupancyGrid)
-        self.priorityQueue = deque()
+        self.priorityQueue = list()
 
     # Push cell to queue according to Euclidean distance order. Leftmost is the smallest
     def pushCellOntoQueue(self, cell):
@@ -31,7 +31,7 @@ class GreedyPlanner(CellBasedForwardSearch):
 
     # Pull the cell with least Euclidean distance
     def popCellFromQueue(self):
-        cell = self.priorityQueue.popleft()
+        cell = self.priorityQueue.pop(0)
         return cell
 
     def resolveDuplicate(self, cell, parentCell):
