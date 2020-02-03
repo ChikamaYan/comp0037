@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 # Import the needed types.
-from comp0037_planner_controller.greedyPlanner import GreedyPlanner
+from comp0037_planner_controller.greedy_planner import GreedyPlanner
 from comp0037_planner_controller.occupancy_grid import OccupancyGrid
 import map_getter
 import rospy
