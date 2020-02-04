@@ -19,10 +19,8 @@ class DijkstraPlanner(CellBasedForwardSearch):
     def pushCellOntoQueue(self, cell):
         cell.pathCost = self.getPathEndingAtCell(cell).travelCost
 
-        # print("current cell cost: " + str(cell.pathCost))
         for i in range(len(self.priorityQueue)):
             if self.priorityQueue[i].pathCost > cell.pathCost:
-                # print("putting cell with cost {} before cell with cost {}".format(cell.pathCost,self.priorityQueue[i].pathCost))
                 self.priorityQueue.insert(i,cell)
                 return
         self.priorityQueue.append(cell)
@@ -36,31 +34,13 @@ class DijkstraPlanner(CellBasedForwardSearch):
         return cell
 
     def resolveDuplicate(self, cell, parentCell):
-        # print("start is {}".format(self.start.coords))
-
-
-        # print("resolveDuplicate cell {} with parent {}".format(cell.coords,parentCell.coords))
-
         currentPathCost = cell.pathCost
         newPathCost = parentCell.pathCost + self.computeLStageAdditiveCost(parentCell,cell)
-
-        # print("parent cost is {}".format(parentCell.pathCost))
-        # print("old path is {}".format(map(lambda c:c.coords,self.getPathEndingAtCell(cell).waypoints)))
-        # print("new path is {}".format(map(lambda c:c.coords,self.getPathEndingAtCell(parentCell).waypoints)))
-
-        # print("comparing old path {} with new {}".format(currentPathCost,newPathCost))
-
-        # self.plannerDrawer.waitForKeyPress()
 
         if newPathCost < currentPathCost:
             cell.parent = parentCell
             cell.pathCost = newPathCost
-
             self.priorityQueue.sort(key=lambda c:c.pathCost)
-            # print("the queue is: ")
-            # print(map(lambda c:c.pathCost,self.priorityQueue))
-            # self.plannerDrawer.waitForKeyPress()
-        # pass
         
 
     def getQueueLen(self):
