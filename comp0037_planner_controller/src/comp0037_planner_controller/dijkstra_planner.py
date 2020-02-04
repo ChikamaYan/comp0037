@@ -19,8 +19,13 @@ class DijkstraPlanner(CellBasedForwardSearch):
 
     # Push cell to queue according to C (distance travelled from start) order. Leftmost is the smallest
     def pushCellOntoQueue(self, cell):
+        cell.pathCost = self.getPathEndingAtCell(cell).travelCost
+
+        # print("current cell cost: " + str(cell.pathCost))
         for i in range(len(self.priorityQueue)):
+            # print("comparing cell with cost {} before cell with cost {}".format(cell.pathCost,self.priorityQueue[i].pathCost))
             if self.priorityQueue[i].pathCost > cell.pathCost:
+                print("putting cell with cost {} before cell with cost {}".format(cell.pathCost,self.priorityQueue[i].pathCost))
                 self.priorityQueue.insert(i,cell)
                 return
         self.priorityQueue.append(cell)
