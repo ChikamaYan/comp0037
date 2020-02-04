@@ -15,38 +15,52 @@ class DijkstraPlanner(CellBasedForwardSearch):
         CellBasedForwardSearch.__init__(self, title, occupancyGrid)
         self.priorityQueue = list()
 
-        self.currentCell = None
-
     # Push cell to queue according to C (distance travelled from start) order. Leftmost is the smallest
     def pushCellOntoQueue(self, cell):
         cell.pathCost = self.getPathEndingAtCell(cell).travelCost
 
         # print("current cell cost: " + str(cell.pathCost))
         for i in range(len(self.priorityQueue)):
-            # print("comparing cell with cost {} before cell with cost {}".format(cell.pathCost,self.priorityQueue[i].pathCost))
             if self.priorityQueue[i].pathCost > cell.pathCost:
-                print("putting cell with cost {} before cell with cost {}".format(cell.pathCost,self.priorityQueue[i].pathCost))
+                # print("putting cell with cost {} before cell with cost {}".format(cell.pathCost,self.priorityQueue[i].pathCost))
                 self.priorityQueue.insert(i,cell)
                 return
         self.priorityQueue.append(cell)
 
-    # Check the queue size is zero
+    # Check the queue size is zero  
     def isQueueEmpty(self):
         return not self.priorityQueue
 
-    # Pull the cell with least Euclidean distance
     def popCellFromQueue(self):
         cell = self.priorityQueue.pop(0)
         return cell
 
     def resolveDuplicate(self, cell, parentCell):
+        # print("start is {}".format(self.start.coords))
+
+
+        # print("resolveDuplicate cell {} with parent {}".format(cell.coords,parentCell.coords))
+
         currentPathCost = cell.pathCost
-        newPathCost = parentCell.pathCost
-        + self.computeLStageAdditiveCost(parentCell,cell)
+        newPathCost = parentCell.pathCost + self.computeLStageAdditiveCost(parentCell,cell)
+
+        # print("parent cost is {}".format(parentCell.pathCost))
+        # print("old path is {}".format(map(lambda c:c.coords,self.getPathEndingAtCell(cell).waypoints)))
+        # print("new path is {}".format(map(lambda c:c.coords,self.getPathEndingAtCell(parentCell).waypoints)))
+
+        # print("comparing old path {} with new {}".format(currentPathCost,newPathCost))
+
+        # self.plannerDrawer.waitForKeyPress()
 
         if newPathCost < currentPathCost:
             cell.parent = parentCell
             cell.pathCost = newPathCost
+
+            self.priorityQueue.sort(key=lambda c:c.pathCost)
+            # print("the queue is: ")
+            # print(map(lambda c:c.pathCost,self.priorityQueue))
+            # self.plannerDrawer.waitForKeyPress()
+        # pass
         
 
     def getQueueLen(self):
@@ -104,7 +118,6 @@ class DijkstraPlanner(CellBasedForwardSearch):
                 return False
             
             cell = self.popCellFromQueue()
-            self.currentCell = cell
             pathToCurrent = self.getPathEndingAtCell(cell)
 
             cell.pathCost = pathToCurrent.travelCost
@@ -114,7 +127,7 @@ class DijkstraPlanner(CellBasedForwardSearch):
                 # don't break here because dijkstra requires the whole queue to be empty
                 # instead, if goal has been reached, just stop adding new cells that would have a higher cost than minimal cost
             
-            if not (self.goalReached and self.currentCell.pathCost>= self.goal.pathCost):
+            if not (self.goalReached and cell.pathCost>= self.goal.pathCost):
                 cells = self.getNextSetOfCellsToBeVisited(cell)
                 for nextCell in cells:
                     if (self.hasCellBeenVisitedAlready(nextCell) == False):
