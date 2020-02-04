@@ -5,6 +5,7 @@ from search_grid import SearchGrid
 from cell import *
 from collections import deque
 import math
+import rospy
 
 class DijkstraPlanner(CellBasedForwardSearch):
 
