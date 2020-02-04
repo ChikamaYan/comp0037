@@ -35,8 +35,14 @@ class DijkstraPlanner(CellBasedForwardSearch):
         return cell
 
     def resolveDuplicate(self, cell, parentCell):
-        # Nothing to do in self case
-        pass
+        currentPathCost = cell.pathCost
+        newPathCost = parentCell.pathCost
+        + self.computeLStageAdditiveCost(parentCell,cell)
+
+        if newPathCost < currentPathCost:
+            cell.parent = parentCell
+            cell.pathCost = newPathCost
+        
 
     def getQueueLen(self):
         return len(self.priorityQueue)
