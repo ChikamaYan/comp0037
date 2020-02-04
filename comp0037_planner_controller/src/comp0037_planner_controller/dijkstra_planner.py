@@ -19,14 +19,11 @@ class DijkstraPlanner(CellBasedForwardSearch):
 
     # Push cell to queue according to C (distance travelled from start) order. Leftmost is the smallest
     def pushCellOntoQueue(self, cell):
-        if self.isQueueEmpty():
-            self.priorityQueue.append(cell)
-            return
-
         for i in range(len(self.priorityQueue)):
             if self.priorityQueue[i].pathCost > cell.pathCost:
                 self.priorityQueue.insert(i,cell)
-                break
+                return
+        self.priorityQueue.append(cell)
 
     # Check the queue size is zero
     def isQueueEmpty(self):
