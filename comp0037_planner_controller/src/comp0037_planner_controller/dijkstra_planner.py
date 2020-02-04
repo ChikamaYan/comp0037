@@ -4,6 +4,7 @@ from cell_based_forward_search import CellBasedForwardSearch
 from search_grid import SearchGrid
 from cell import *
 from collections import deque
+from planned_path import PlannedPath
 import math
 import rospy
 
@@ -96,7 +97,7 @@ class DijkstraPlanner(CellBasedForwardSearch):
             
             cell = self.popCellFromQueue()
             self.currentCell = cell
-            pathToCurrent = self.extractPathEndingAtCell(cell,"black")
+            pathToCurrent = self.getPathEndingAtCell(cell)
 
             cell.pathCost = pathToCurrent.travelCost
             if (self.hasGoalBeenReached(cell) == True):
@@ -137,3 +138,28 @@ class DijkstraPlanner(CellBasedForwardSearch):
 
         return self.goalReached
 
+    def getPathEndingAtCell(self, pathEndCell):
+        # Construct the path object and mark if the goal was reached
+        path = PlannedPath()
+        
+        path.goalReached = self.goalReached
+        
+        # Initial condition - the goal cell
+        path.waypoints.append(pathEndCell)
+               
+        # Start at the goal and find the parent. Find the cost associated with the parent
+        cell = pathEndCell.parent
+        path.travelCost = self.computeLStageAdditiveCost(pathEndCell.parent, pathEndCell)
+        
+        # Iterate back through and extract each parent in turn and add
+        # it to the path. To work out the travel length along the
+        # path, you'll also have to add self at self stage.
+        while (cell is not None):
+            path.waypoints.appendleft(cell)
+            path.travelCost = path.travelCost + self.computeLStageAdditiveCost(cell.parent, cell)
+            cell = cell.parent
+            
+        # Update the stats on the size of the path
+        path.numberOfWaypoints = len(path.waypoints)
+
+        return path
