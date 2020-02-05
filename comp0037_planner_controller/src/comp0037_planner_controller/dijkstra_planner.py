@@ -8,6 +8,7 @@ from planned_path import PlannedPath
 import math
 import rospy
 
+
 class DijkstraPlanner(CellBasedForwardSearch):
 
     # Construct the new planner object
@@ -17,15 +18,15 @@ class DijkstraPlanner(CellBasedForwardSearch):
 
     # Push cell to queue according to C (distance travelled from start) order. Leftmost is the smallest
     def pushCellOntoQueue(self, cell):
-        cell.pathCost = self.getPathEndingAtCell(cell).travelCost
+        cell.pathCost = self.computeCellCost(cell)
 
         for i in range(len(self.priorityQueue)):
             if self.priorityQueue[i].pathCost > cell.pathCost:
-                self.priorityQueue.insert(i,cell)
+                self.priorityQueue.insert(i, cell)
                 return
         self.priorityQueue.append(cell)
 
-    # Check the queue size is zero  
+    # Check the queue size is zero
     def isQueueEmpty(self):
         return not self.priorityQueue
 
@@ -35,13 +36,13 @@ class DijkstraPlanner(CellBasedForwardSearch):
 
     def resolveDuplicate(self, cell, parentCell):
         currentPathCost = cell.pathCost
-        newPathCost = parentCell.pathCost + self.computeLStageAdditiveCost(parentCell,cell)
+        newPathCost = parentCell.pathCost + \
+            self.computeLStageAdditiveCost(parentCell, cell)
 
         if newPathCost < currentPathCost:
             cell.parent = parentCell
             cell.pathCost = newPathCost
-            self.priorityQueue.sort(key=lambda c:c.pathCost)
-        
+            self.priorityQueue.sort(key=lambda c: c.pathCost)
 
     def getQueueLen(self):
         return len(self.priorityQueue)
@@ -52,7 +53,7 @@ class DijkstraPlanner(CellBasedForwardSearch):
         # the same method multiple times and have it work.
         while (self.isQueueEmpty() == False):
             self.popCellFromQueue()
-        
+
         # Create or update the search grid from the occupancy grid and seed
         # unvisited and occupied cells.
         if (self.searchGrid is None):
@@ -96,18 +97,17 @@ class DijkstraPlanner(CellBasedForwardSearch):
             # planner from hanging.
             if rospy.is_shutdown():
                 return False
-            
-            cell = self.popCellFromQueue()
-            pathToCurrent = self.getPathEndingAtCell(cell)
 
-            cell.pathCost = pathToCurrent.travelCost
+            cell = self.popCellFromQueue()
+
+            cell.pathCost = self.computeCellCost(cell)
             if (self.hasGoalBeenReached(cell) == True):
                 self.goalReached = True
                 # break
                 # don't break here because dijkstra requires the whole queue to be empty
                 # instead, if goal has been reached, just stop adding new cells that would have a higher cost than minimal cost
-            
-            if not (self.goalReached and cell.pathCost>= self.goal.pathCost):
+
+            if not (self.goalReached and cell.pathCost >= self.goal.pathCost):
                 cells = self.getNextSetOfCellsToBeVisited(cell)
                 for nextCell in cells:
                     if (self.hasCellBeenVisitedAlready(nextCell) == False):
@@ -117,7 +117,8 @@ class DijkstraPlanner(CellBasedForwardSearch):
                     else:
                         self.resolveDuplicate(nextCell, cell)
                     # update maximum length of queue
-                    self.maxQueueLen = max(self.maxQueueLen,self.getQueueLen())
+                    self.maxQueueLen = max(
+                        self.maxQueueLen, self.getQueueLen())
 
             # Now that we've checked all the actions for this cell,
             # mark it as dead
@@ -128,10 +129,10 @@ class DijkstraPlanner(CellBasedForwardSearch):
 
         # Do a final draw to make sure that the graphics are shown, even at the end state
         self.drawCurrentState()
-        
+
         print "numberOfCellsVisited = " + str(self.numberOfCellsVisited)
-        print ("maxQueueLen = " + str(self.maxQueueLen))
-        
+        print("maxQueueLen = " + str(self.maxQueueLen))
+
         if self.goalReached:
             print "Goal reached"
         else:
@@ -139,27 +140,32 @@ class DijkstraPlanner(CellBasedForwardSearch):
 
         return self.goalReached
 
+    def computeCellCost(self, cell):
+        return self.getPathEndingAtCell(cell).travelCost
+
     def getPathEndingAtCell(self, pathEndCell):
         # Construct the path object and mark if the goal was reached
         path = PlannedPath()
-        
+
         path.goalReached = self.goalReached
-        
+
         # Initial condition - the goal cell
         path.waypoints.append(pathEndCell)
-               
+
         # Start at the goal and find the parent. Find the cost associated with the parent
         cell = pathEndCell.parent
-        path.travelCost = self.computeLStageAdditiveCost(pathEndCell.parent, pathEndCell)
-        
+        path.travelCost = self.computeLStageAdditiveCost(
+            pathEndCell.parent, pathEndCell)
+
         # Iterate back through and extract each parent in turn and add
         # it to the path. To work out the travel length along the
         # path, you'll also have to add self at self stage.
         while (cell is not None):
             path.waypoints.appendleft(cell)
-            path.travelCost = path.travelCost + self.computeLStageAdditiveCost(cell.parent, cell)
+            path.travelCost = path.travelCost + \
+                self.computeLStageAdditiveCost(cell.parent, cell)
             cell = cell.parent
-            
+
         # Update the stats on the size of the path
         path.numberOfWaypoints = len(path.waypoints)
 
