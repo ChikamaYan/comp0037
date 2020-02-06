@@ -7,6 +7,7 @@ from collections import deque
 from cell import *
 from planned_path import PlannedPath
 from math import *
+import operator
 import rospy
 
 class GeneralForwardSearchAlgorithm(PlannerBase):
@@ -191,6 +192,8 @@ class GeneralForwardSearchAlgorithm(PlannerBase):
         path.travelCost = self.computeLStageAdditiveCost(
             pathEndCell.parent, pathEndCell)
 
+        currentDirection = list(map(operator.sub,pathEndCell.coords,cell.coords))
+
         # Iterate back through and extract each parent in turn and add
         # it to the path. To work out the travel length along the
         # path, you'll also have to add self at self stage.
@@ -198,6 +201,15 @@ class GeneralForwardSearchAlgorithm(PlannerBase):
             path.waypoints.appendleft(cell)
             path.travelCost = path.travelCost + \
                 self.computeLStageAdditiveCost(cell.parent, cell)
+
+            # compute angel turned
+            preDirection = list(map(operator.sub,cell.coords,cell.parent.coords))
+            dotProduct = currentDirection[0] * preDirection[0] + currentDirection[1] * preDirection[1]
+            cosValue = dotProduct / (sum(map(lambda x:x*x,currentDirection)) * sum(map(lambda x:x*x,preDirection)))
+            degree = degrees(acos(cosValue))
+            path.angleTurned += degree
+
+            currentDirection = preDirection
             cell = cell.parent
 
         # Update the stats on the size of the path
