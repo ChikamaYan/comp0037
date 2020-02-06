@@ -178,6 +178,33 @@ class GeneralForwardSearchAlgorithm(PlannerBase):
 
         return self.goalReached
 
+
+    def getPathEndingAtCell(self, pathEndCell):
+        # Construct the path object and mark if the goal was reached
+        path = PlannedPath()
+
+        # Initial condition - the goal cell
+        path.waypoints.append(pathEndCell)
+
+        # Start at the goal and find the parent. Find the cost associated with the parent
+        cell = pathEndCell.parent
+        path.travelCost = self.computeLStageAdditiveCost(
+            pathEndCell.parent, pathEndCell)
+
+        # Iterate back through and extract each parent in turn and add
+        # it to the path. To work out the travel length along the
+        # path, you'll also have to add self at self stage.
+        while (cell is not None):
+            path.waypoints.appendleft(cell)
+            path.travelCost = path.travelCost + \
+                self.computeLStageAdditiveCost(cell.parent, cell)
+            cell = cell.parent
+
+        # Update the stats on the size of the path
+        path.numberOfWaypoints = len(path.waypoints)
+
+        return path
+
     # This method extracts a path from the pathEndCell to the start
     # cell. The path is a list actually sorted in the order:
     # cell(x_1), cell(x_2), ... , cell(x_K), cell(x_G). You can use
@@ -188,27 +215,9 @@ class GeneralForwardSearchAlgorithm(PlannerBase):
     def extractPathEndingAtCell(self, pathEndCell, colour):
 
         # Construct the path object and mark if the goal was reached
-        path = PlannedPath()
-        
+        path = self.getPathEndingAtCell(pathEndCell)
+
         path.goalReached = self.goalReached
-        
-        # Initial condition - the goal cell
-        path.waypoints.append(pathEndCell)
-               
-        # Start at the goal and find the parent. Find the cost associated with the parent
-        cell = pathEndCell.parent
-        path.travelCost = self.computeLStageAdditiveCost(pathEndCell.parent, pathEndCell)
-        
-        # Iterate back through and extract each parent in turn and add
-        # it to the path. To work out the travel length along the
-        # path, you'll also have to add self at self stage.
-        while (cell is not None):
-            path.waypoints.appendleft(cell)
-            path.travelCost = path.travelCost + self.computeLStageAdditiveCost(cell.parent, cell)
-            cell = cell.parent
-            
-        # Update the stats on the size of the path
-        path.numberOfWaypoints = len(path.waypoints)
 
         # Note that if we failed to reach the goal, the above mechanism computes a path length of 0.
         # Therefore, if we didn't reach the goal, change it to infinity
@@ -217,6 +226,7 @@ class GeneralForwardSearchAlgorithm(PlannerBase):
 
         print "Path travel cost = " + str(path.travelCost)
         print "Path cardinality = " + str(path.numberOfWaypoints)
+        print ("Path angle turned = " + str(path.angleTurned))
         
         # Draw the path if requested
         if (self.showGraphics == True):

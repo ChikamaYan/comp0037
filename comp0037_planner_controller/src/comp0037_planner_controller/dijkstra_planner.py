@@ -143,30 +143,3 @@ class DijkstraPlanner(CellBasedForwardSearch):
     def computeCellCost(self, cell):
         return self.getPathEndingAtCell(cell).travelCost
 
-    def getPathEndingAtCell(self, pathEndCell):
-        # Construct the path object and mark if the goal was reached
-        path = PlannedPath()
-
-        path.goalReached = self.goalReached
-
-        # Initial condition - the goal cell
-        path.waypoints.append(pathEndCell)
-
-        # Start at the goal and find the parent. Find the cost associated with the parent
-        cell = pathEndCell.parent
-        path.travelCost = self.computeLStageAdditiveCost(
-            pathEndCell.parent, pathEndCell)
-
-        # Iterate back through and extract each parent in turn and add
-        # it to the path. To work out the travel length along the
-        # path, you'll also have to add self at self stage.
-        while (cell is not None):
-            path.waypoints.appendleft(cell)
-            path.travelCost = path.travelCost + \
-                self.computeLStageAdditiveCost(cell.parent, cell)
-            cell = cell.parent
-
-        # Update the stats on the size of the path
-        path.numberOfWaypoints = len(path.waypoints)
-
-        return path
