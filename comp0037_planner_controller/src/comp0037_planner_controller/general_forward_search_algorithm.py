@@ -192,7 +192,8 @@ class GeneralForwardSearchAlgorithm(PlannerBase):
         path.travelCost = self.computeLStageAdditiveCost(
             pathEndCell.parent, pathEndCell)
 
-        currentDirection = list(map(operator.sub,pathEndCell.coords,cell.coords))
+        if cell is not None:
+            currentDirection = list(map(operator.sub,pathEndCell.coords,cell.coords))
 
         # Iterate back through and extract each parent in turn and add
         # it to the path. To work out the travel length along the
@@ -203,13 +204,22 @@ class GeneralForwardSearchAlgorithm(PlannerBase):
                 self.computeLStageAdditiveCost(cell.parent, cell)
 
             # compute angel turned
-            preDirection = list(map(operator.sub,cell.coords,cell.parent.coords))
-            dotProduct = currentDirection[0] * preDirection[0] + currentDirection[1] * preDirection[1]
-            cosValue = dotProduct / (sum(map(lambda x:x*x,currentDirection)) * sum(map(lambda x:x*x,preDirection)))
-            degree = degrees(acos(cosValue))
-            path.angleTurned += degree
+            if cell.parent is not None:
+                preDirection = list(map(operator.sub,cell.coords,cell.parent.coords))
+                dotProduct = currentDirection[0] * preDirection[0] + currentDirection[1] * preDirection[1]
+                cosValue = dotProduct / float(sqrt((sum(map(lambda x:x*x,currentDirection)))) * float(sqrt(sum(map(lambda x:x*x,preDirection)))))
+                degree = degrees(acos(cosValue))
+                path.angleTurned += degree
 
-            currentDirection = preDirection
+                # if degree != 0:
+                #     print("currentDirection = {}".format(currentDirection))
+                #     print("preDirection = {}".format(preDirection))
+                #     print("dotProduct = {}".format(dotProduct))
+                #     print("cosValue = {}".format(cosValue))
+                #     print("degree = {}".format(degree))
+                    # self.plannerDrawer.waitForKeyPress()
+
+                currentDirection = preDirection
             cell = cell.parent
 
         # Update the stats on the size of the path
