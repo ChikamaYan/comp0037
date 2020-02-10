@@ -36,3 +36,5 @@ class Cell(object):
         # it, this is the necessary initial condition.
         self.pathCost = float("inf")
 
+        self.angel = 0
+

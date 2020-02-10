@@ -5,7 +5,8 @@ from search_grid import SearchGrid
 from cell import *
 from collections import deque
 from planned_path import PlannedPath
-import math
+import operator
+from math import *
 import rospy
 
 
@@ -18,7 +19,7 @@ class DijkstraPlanner(CellBasedForwardSearch):
 
     # Push cell to queue according to C (distance travelled from start) order. Leftmost is the smallest
     def pushCellOntoQueue(self, cell):
-        cell.pathCost = self.computeCellCost(cell)
+        self.assignCellCosts(cell)
 
         for i in range(len(self.priorityQueue)):
             if self.priorityQueue[i].pathCost > cell.pathCost:
@@ -39,10 +40,15 @@ class DijkstraPlanner(CellBasedForwardSearch):
         newPathCost = parentCell.pathCost + \
             self.computeLStageAdditiveCost(parentCell, cell)
 
-        if newPathCost <= currentPathCost:
-            # TODO: a good idea here is to choose the parent with less degree when travel cost is equal
+        currentAngleCost = cell.angleCost
+        newAngleCost = parentCell.angleCost + self.computeAngleTurned(parentCell.parent,parentCell,cell)
+        if newPathCost < currentPathCost or (newPathCost == currentPathCost and newAngleCost < currentAngleCost):
+            # choose the path with less angle turned if the distance cost is the same
+
             cell.parent = parentCell
             cell.pathCost = newPathCost
+            cell.angleCost = newAngleCost
+            
             self.priorityQueue.sort(key=lambda c: c.pathCost)
 
     def getQueueLen(self):
@@ -101,7 +107,7 @@ class DijkstraPlanner(CellBasedForwardSearch):
 
             cell = self.popCellFromQueue()
 
-            cell.pathCost = self.computeCellCost(cell)
+            self.assignCellCosts(cell)
             # print("parent is " + str(cell.parent))
             # self.plannerDrawer.waitForKeyPress()
             if (self.hasGoalBeenReached(cell) == True):
@@ -143,19 +149,46 @@ class DijkstraPlanner(CellBasedForwardSearch):
 
         return self.goalReached
 
-    def computeCellCost(self, cell):
-        ans = 0
+    def assignCellCosts(self, cell):
+        pathCost = 0
+        angleCost = 0
         if cell == self.start and cell.parent is None:
-            ans = 0
+            pathCost = 0
+            angleCost = 0
         else:
-            ans = cell.parent.pathCost + self.computeLStageAdditiveCost(cell.parent, cell)
+            pathCost = cell.parent.pathCost + self.computeLStageAdditiveCost(cell.parent, cell)
+            if (cell.parent.parent is not None):
+                angleCost = cell.parent.angleCost + self.computeAngleTurned(cell.parent.parent,cell.parent,cell)
 
-        # costFromPath = self.getPathEndingAtCell(cell).travelCost
+        cell.pathCost = pathCost
+        cell.angleCost = angleCost
 
-        # if (round(costFromPath,4)!=round(ans,4)):
-        #     print("different: {} and {}".format(costFromPath,ans))
+        # path = self.getPathEndingAtCell(cell)
+
+        # if (path.travelCost!=pathCost):
+        #     print("different: {} and {}".format(path.travelCost,pathCost))
+        #     print("the types are: {}, {}".format(type(path.travelCost),type(pathCost)))
         #     self.plannerDrawer.waitForKeyPress()
 
-        return ans
+        # if (round(path.angleTurned,4)!=round(angleCost,4)):
+        #     print("different: {} and {}".format(path.angleTurned,angleCost))
+        #     self.plannerDrawer.waitForKeyPress()
+
+    def computeAngleTurned(self, cell1, cell2, cell3):
+        """
+        compute the angel turned when going cell1->cell2->cell3
+        """
+        if (cell1 is None or cell2 is None or cell3 is None):
+            return 0
+
+        currentDirection = list(map(operator.sub,cell3.coords,cell2.coords))
+        preDirection = list(map(operator.sub,cell2.coords,cell1.coords))
+        dotProduct = currentDirection[0] * preDirection[0] + currentDirection[1] * preDirection[1]
+        cosValue = dotProduct / float(sqrt((sum(map(lambda x:x*x,currentDirection)))) * float(sqrt(sum(map(lambda x:x*x,preDirection)))))
+        degree = degrees(acos(cosValue))
+
+        return degree
+        
+
         
 
