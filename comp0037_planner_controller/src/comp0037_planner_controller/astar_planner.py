@@ -35,4 +35,5 @@ class AstarPlanner(DijkstraPlanner):
             return abs(k_coords[0]-G_coords[0])+abs(k_coords[1]-G_coords[1])
 
     def computeCellCost(self, cell):
-        return self.getPathEndingAtCell(cell).travelCost + self.computeHeuristic(cell)
+        return super().computeCellCost(cell) + self.computeHeuristic(cell)
+        # return self.getPathEndingAtCell(cell).travelCost + self.computeHeuristic(cell)

@@ -141,5 +141,6 @@ class DijkstraPlanner(CellBasedForwardSearch):
         return self.goalReached
 
     def computeCellCost(self, cell):
-        return self.getPathEndingAtCell(cell).travelCost
+        return cell.parent.pathCost + self.computeLStageAdditiveCost(cell.parent, cell)
+        # return self.getPathEndingAtCell(cell).travelCost
 
