@@ -11,7 +11,7 @@ import rospy
 
 class AstarPlanner(DijkstraPlanner):
 
-    def __init__(self, title, occupancyGrid, heuristic="octile"):
+    def __init__(self, title, occupancyGrid, heuristic="manhattan"):
         DijkstraPlanner.__init__(self, title, occupancyGrid)
         self.heuristic = heuristic
 

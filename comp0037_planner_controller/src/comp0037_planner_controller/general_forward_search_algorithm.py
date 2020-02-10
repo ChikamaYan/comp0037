@@ -192,8 +192,7 @@ class GeneralForwardSearchAlgorithm(PlannerBase):
         path.travelCost = self.computeLStageAdditiveCost(
             pathEndCell.parent, pathEndCell)
 
-        if cell is not None:
-            currentDirection = list(map(operator.sub,pathEndCell.coords,cell.coords))
+        last_cell = pathEndCell
 
         # Iterate back through and extract each parent in turn and add
         # it to the path. To work out the travel length along the
@@ -204,22 +203,9 @@ class GeneralForwardSearchAlgorithm(PlannerBase):
                 self.computeLStageAdditiveCost(cell.parent, cell)
 
             # compute angel turned
-            if cell.parent is not None:
-                preDirection = list(map(operator.sub,cell.coords,cell.parent.coords))
-                dotProduct = currentDirection[0] * preDirection[0] + currentDirection[1] * preDirection[1]
-                cosValue = dotProduct / float(sqrt((sum(map(lambda x:x*x,currentDirection)))) * float(sqrt(sum(map(lambda x:x*x,preDirection)))))
-                degree = degrees(acos(cosValue))
-                path.angleTurned += degree
+            path.angleTurned += self.computeAngleTurned(cell.parent,cell,last_cell)
 
-                # if degree != 0:
-                #     print("currentDirection = {}".format(currentDirection))
-                #     print("preDirection = {}".format(preDirection))
-                #     print("dotProduct = {}".format(dotProduct))
-                #     print("cosValue = {}".format(cosValue))
-                #     print("degree = {}".format(degree))
-                    # self.plannerDrawer.waitForKeyPress()
-
-                currentDirection = preDirection
+            last_cell = cell
             cell = cell.parent
 
         # Update the stats on the size of the path
@@ -249,6 +235,10 @@ class GeneralForwardSearchAlgorithm(PlannerBase):
         print "Path travel cost = " + str(path.travelCost)
         print "Path cardinality = " + str(path.numberOfWaypoints)
         print ("Path angle turned = " + str(path.angleTurned))
+
+        # just to check if they work correctly
+        print ("pathCost from cell = " + str(self.goal.pathCost))
+        print ("angleCost from cell = " + str(self.goal.angleCost))
         
         # Draw the path if requested
         if (self.showGraphics == True):
@@ -271,4 +261,26 @@ class GeneralForwardSearchAlgorithm(PlannerBase):
         path = self.extractPathEndingAtCell(self.goal, 'yellow')
        
         return path
+
+    def computeAngleTurned(self, cell1, cell2, cell3):
+        """
+        compute the angel turned when going cell1->cell2->cell3
+        """
+        if (cell1 is None or cell2 is None or cell3 is None):
+            return 0
+
+        currentDirection = list(map(operator.sub,cell3.coords,cell2.coords))
+        preDirection = list(map(operator.sub,cell2.coords,cell1.coords))
+        dotProduct = currentDirection[0] * preDirection[0] + currentDirection[1] * preDirection[1]
+        cosValue = dotProduct / float(sqrt((sum(map(lambda x:x*x,currentDirection)))) * float(sqrt(sum(map(lambda x:x*x,preDirection)))))
+        degree = degrees(acos(cosValue))
+
+        # if degree != 0:
+        #     print("currentDirection = {}".format(currentDirection))
+        #     print("preDirection = {}".format(preDirection))
+        #     print("dotProduct = {}".format(dotProduct))
+        #     print("cosValue = {}".format(cosValue))
+        #     print("degree = {}".format(degree))
+
+        return round(degree)
             

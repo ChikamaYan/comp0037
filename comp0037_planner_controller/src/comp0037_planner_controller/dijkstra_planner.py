@@ -47,9 +47,9 @@ class DijkstraPlanner(CellBasedForwardSearch):
 
         currentAngleCost = cell.angleCost
         newAngleCost = parentCell.angleCost + self.computeAngleTurned(parentCell.parent,parentCell,cell)
-        if newPathCost < currentPathCost or (newPathCost == currentPathCost and newAngleCost < currentAngleCost):
-            # choose the path with less angle turned if the distance cost is the same
-
+        if newPathCost < currentPathCost:
+        # a different version that chooses the path with less angle turned if the distance cost is the same
+        # if newPathCost < currentPathCost or (newPathCost == currentPathCost and newAngleCost < currentAngleCost):
             cell.parent = parentCell
             cell.pathCost = newPathCost
             cell.angleCost = newAngleCost
@@ -179,20 +179,6 @@ class DijkstraPlanner(CellBasedForwardSearch):
         #     print("different: {} and {}".format(path.angleTurned,angleCost))
         #     self.plannerDrawer.waitForKeyPress()
 
-    def computeAngleTurned(self, cell1, cell2, cell3):
-        """
-        compute the angel turned when going cell1->cell2->cell3
-        """
-        if (cell1 is None or cell2 is None or cell3 is None):
-            return 0
-
-        currentDirection = list(map(operator.sub,cell3.coords,cell2.coords))
-        preDirection = list(map(operator.sub,cell2.coords,cell1.coords))
-        dotProduct = currentDirection[0] * preDirection[0] + currentDirection[1] * preDirection[1]
-        cosValue = dotProduct / float(sqrt((sum(map(lambda x:x*x,currentDirection)))) * float(sqrt(sum(map(lambda x:x*x,preDirection)))))
-        degree = degrees(acos(cosValue))
-
-        return degree
         
 
         
