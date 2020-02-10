@@ -38,8 +38,8 @@ class AstarPlanner(DijkstraPlanner):
 
     def resolveDuplicate(self, cell, parentCell):
         currentPathCost = cell.pathCost
-        newPathCost = parentCell.pathCost - self.computeHeuristic(parentCell) + \
-            self.computeLStageAdditiveCost(parentCell, cell) + self.computeHeuristic(cell)
+        newPathCost = parentCell.pathCost+ \
+            self.computeLStageAdditiveCost(parentCell, cell)
 
         currentAngleCost = cell.angleCost
         newAngleCost = parentCell.angleCost + self.computeAngleTurned(parentCell.parent,parentCell,cell)
@@ -50,7 +50,7 @@ class AstarPlanner(DijkstraPlanner):
             cell.pathCost = newPathCost
             cell.angleCost = newAngleCost
             
-            self.priorityQueue.sort(key=lambda c: c.pathCost)
+            self.priorityQueue.sort(key=lambda c: c.getOverallCost()) 
 
     def assignCellCosts(self, cell):
         # path =self.getPathEndingAtCell(cell)
@@ -59,19 +59,20 @@ class AstarPlanner(DijkstraPlanner):
         # return
 
 
-        pathCost = 0
-        angleCost = 0
-        if cell == self.start and cell.parent is None:
-            pathCost = self.computeHeuristic(cell)
-            angleCost = 0
-        else:
-            pathCost = cell.parent.pathCost - self.computeHeuristic(cell.parent) + \
-                self.computeLStageAdditiveCost(cell.parent, cell) + self.computeHeuristic(cell)
-            if (cell.parent.parent is not None):
-                angleCost = cell.parent.angleCost + self.computeAngleTurned(cell.parent.parent,cell.parent,cell)
+        # pathCost = 0
+        # angleCost = 0
+        # if cell == self.start and cell.parent is None:
+        #     pathCost = self.computeHeuristic(cell)
+        #     angleCost = 0
+        # else:
+        #     pathCost = cell.parent.pathCost - self.computeHeuristic(cell.parent) + \
+        #         self.computeLStageAdditiveCost(cell.parent, cell) + self.computeHeuristic(cell)
+        #     if (cell.parent.parent is not None):
+        #         angleCost = cell.parent.angleCost + self.computeAngleTurned(cell.parent.parent,cell.parent,cell)
 
-        cell.pathCost = pathCost
-        cell.angleCost = angleCost
+        # cell.pathCost = pathCost
+        # cell.angleCost = angleCost
 
 
-        # return self.getPathEndingAtCell(cell).travelCost + self.computeHeuristic(cell)
+        super(AstarPlanner,self).assignCellCosts(cell)
+        cell.heuristic = self.computeHeuristic(cell)

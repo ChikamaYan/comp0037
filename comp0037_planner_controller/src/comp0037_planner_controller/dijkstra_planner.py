@@ -22,7 +22,7 @@ class DijkstraPlanner(CellBasedForwardSearch):
         self.assignCellCosts(cell)
 
         for i in range(len(self.priorityQueue)):
-            if self.priorityQueue[i].pathCost > cell.pathCost:
+            if self.priorityQueue[i].getOverallCost() > cell.getOverallCost():
                 self.priorityQueue.insert(i, cell)
                 return
         self.priorityQueue.append(cell)
