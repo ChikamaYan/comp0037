@@ -34,6 +34,24 @@ class AstarPlanner(DijkstraPlanner):
 
             return abs(k_coords[0]-G_coords[0])+abs(k_coords[1]-G_coords[1])
 
+    def resolveDuplicate(self, cell, parentCell):
+        currentPathCost = cell.pathCost
+        newPathCost = parentCell.pathCost - self.computeHeuristic(parentCell) + \
+            self.computeLStageAdditiveCost(parentCell, cell) + self.computeHeuristic(cell)
+
+        if newPathCost <= currentPathCost:
+            # TODO: a good idea here is to choose the parent with less degree when travel cost is equal
+            cell.parent = parentCell
+            cell.pathCost = newPathCost
+            self.priorityQueue.sort(key=lambda c: c.pathCost)
+
     def computeCellCost(self, cell):
-        return super().computeCellCost(cell) + self.computeHeuristic(cell)
+        ans = 0
+        if cell == self.start and cell.parent is None:
+            ans = self.computeHeuristic(cell)
+        else:
+            ans = cell.parent.pathCost - self.computeHeuristic(cell.parent) + \
+                self.computeLStageAdditiveCost(cell.parent, cell) + self.computeHeuristic(cell)
+        
+        return ans
         # return self.getPathEndingAtCell(cell).travelCost + self.computeHeuristic(cell)

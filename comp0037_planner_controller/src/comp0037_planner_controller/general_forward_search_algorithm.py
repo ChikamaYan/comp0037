@@ -179,14 +179,8 @@ class GeneralForwardSearchAlgorithm(PlannerBase):
 
         return self.goalReached
 
-    # This method extracts a path from the pathEndCell to the start
-    # cell. The path is a list actually sorted in the order:
-    # cell(x_1), cell(x_2), ... , cell(x_K), cell(x_G). You can use
-    # this method to try to find the path from any end cell. However,
-    # depending upon the planner used, the results might not be
-    # valid. In this case, the path will probably not terminate at the
-    # start cell.
-    def extractPathEndingAtCell(self, pathEndCell, colour):
+
+    def getPathEndingAtCell(self, pathEndCell):
         # Construct the path object and mark if the goal was reached
         path = PlannedPath()
 
@@ -223,13 +217,27 @@ class GeneralForwardSearchAlgorithm(PlannerBase):
                 #     print("dotProduct = {}".format(dotProduct))
                 #     print("cosValue = {}".format(cosValue))
                 #     print("degree = {}".format(degree))
-                #     self.plannerDrawer.waitForKeyPress()
+                    # self.plannerDrawer.waitForKeyPress()
 
                 currentDirection = preDirection
             cell = cell.parent
 
         # Update the stats on the size of the path
         path.numberOfWaypoints = len(path.waypoints)
+
+        return path
+
+    # This method extracts a path from the pathEndCell to the start
+    # cell. The path is a list actually sorted in the order:
+    # cell(x_1), cell(x_2), ... , cell(x_K), cell(x_G). You can use
+    # this method to try to find the path from any end cell. However,
+    # depending upon the planner used, the results might not be
+    # valid. In this case, the path will probably not terminate at the
+    # start cell.
+    def extractPathEndingAtCell(self, pathEndCell, colour):
+
+        # Construct the path object and mark if the goal was reached
+        path = self.getPathEndingAtCell(pathEndCell)
 
         path.goalReached = self.goalReached
 

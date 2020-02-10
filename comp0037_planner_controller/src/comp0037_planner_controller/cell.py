@@ -36,5 +36,3 @@ class Cell(object):
         # it, this is the necessary initial condition.
         self.pathCost = float("inf")
 
-        # add a new parameter to store the heuristic to the goal
-        self.heuristic = 0

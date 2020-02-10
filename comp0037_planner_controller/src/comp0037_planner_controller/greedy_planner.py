@@ -15,10 +15,10 @@ class GreedyPlanner(CellBasedForwardSearch):
 
     # Push cell to queue according to Euclidean distance order. Leftmost is the smallest
     def pushCellOntoQueue(self, cell):
-        cell.heuristic = self.computeHeuristic(cell)
+        cell.pathCost = self.computeHeuristic(cell)
 
         for i in range(len(self.priorityQueue)):
-            if self.priorityQueue[i].heuristic > cell.heuristic:
+            if self.priorityQueue[i].pathCost > cell.pathCost:
                 self.priorityQueue.insert(i,cell)
                 return
                 

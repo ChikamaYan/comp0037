@@ -39,7 +39,8 @@ class DijkstraPlanner(CellBasedForwardSearch):
         newPathCost = parentCell.pathCost + \
             self.computeLStageAdditiveCost(parentCell, cell)
 
-        if newPathCost < currentPathCost:
+        if newPathCost <= currentPathCost:
+            # TODO: a good idea here is to choose the parent with less degree when travel cost is equal
             cell.parent = parentCell
             cell.pathCost = newPathCost
             self.priorityQueue.sort(key=lambda c: c.pathCost)
@@ -101,6 +102,8 @@ class DijkstraPlanner(CellBasedForwardSearch):
             cell = self.popCellFromQueue()
 
             cell.pathCost = self.computeCellCost(cell)
+            # print("parent is " + str(cell.parent))
+            # self.plannerDrawer.waitForKeyPress()
             if (self.hasGoalBeenReached(cell) == True):
                 self.goalReached = True
                 # break
@@ -141,6 +144,18 @@ class DijkstraPlanner(CellBasedForwardSearch):
         return self.goalReached
 
     def computeCellCost(self, cell):
-        return cell.parent.pathCost + self.computeLStageAdditiveCost(cell.parent, cell)
-        # return self.getPathEndingAtCell(cell).travelCost
+        ans = 0
+        if cell == self.start and cell.parent is None:
+            ans = 0
+        else:
+            ans = cell.parent.pathCost + self.computeLStageAdditiveCost(cell.parent, cell)
+
+        # costFromPath = self.getPathEndingAtCell(cell).travelCost
+
+        # if (round(costFromPath,4)!=round(ans,4)):
+        #     print("different: {} and {}".format(costFromPath,ans))
+        #     self.plannerDrawer.waitForKeyPress()
+
+        return ans
+        
 
