@@ -24,8 +24,13 @@ class DijkstraPlanner(CellBasedForwardSearch):
         for i in range(len(self.priorityQueue)):
             if self.priorityQueue[i].getOverallCost() > cell.getOverallCost():
                 self.priorityQueue.insert(i, cell)
+                # print("Cell costs are: " + str(map(lambda c:c.getOverallCost(),self.priorityQueue)))
+                # print("Cell distance costs are: " + str(map(lambda c:c.pathCost,self.priorityQueue)))
+                # print("Cell heuristics are: " + str(map(lambda c:c.heuristic,self.priorityQueue)))
+                # self.plannerDrawer.waitForKeyPress()
                 return
         self.priorityQueue.append(cell)
+
 
     # Check the queue size is zero
     def isQueueEmpty(self):
@@ -49,7 +54,7 @@ class DijkstraPlanner(CellBasedForwardSearch):
             cell.pathCost = newPathCost
             cell.angleCost = newAngleCost
             
-            self.priorityQueue.sort(key=lambda c: c.pathCost)
+            self.priorityQueue.sort(key=lambda c: c.getOverallCost())
 
     def getQueueLen(self):
         return len(self.priorityQueue)
@@ -116,7 +121,7 @@ class DijkstraPlanner(CellBasedForwardSearch):
                 # don't break here because dijkstra requires the whole queue to be empty
                 # instead, if goal has been reached, just stop adding new cells that would have a higher cost than minimal cost
 
-            if not (self.goalReached and cell.pathCost >= self.goal.pathCost):
+            if not (self.goalReached and cell.getOverallCost() >= self.goal.getOverallCost()):
                 cells = self.getNextSetOfCellsToBeVisited(cell)
                 for nextCell in cells:
                     if (self.hasCellBeenVisitedAlready(nextCell) == False):

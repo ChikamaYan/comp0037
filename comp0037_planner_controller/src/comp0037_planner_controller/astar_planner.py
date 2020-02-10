@@ -36,21 +36,21 @@ class AstarPlanner(DijkstraPlanner):
         print("ERROR: heuristic not defined")
         return None
 
-    def resolveDuplicate(self, cell, parentCell):
-        currentPathCost = cell.pathCost
-        newPathCost = parentCell.pathCost+ \
-            self.computeLStageAdditiveCost(parentCell, cell)
+    # def resolveDuplicate(self, cell, parentCell):
+    #     currentPathCost = cell.pathCost
+    #     newPathCost = parentCell.pathCost - self.computeHeuristic(parentCell)+ \
+    #         self.computeLStageAdditiveCost(parentCell, cell) + self.computeHeuristic(cell)
 
-        currentAngleCost = cell.angleCost
-        newAngleCost = parentCell.angleCost + self.computeAngleTurned(parentCell.parent,parentCell,cell)
-        if newPathCost < currentPathCost or (newPathCost == currentPathCost and newAngleCost < currentAngleCost):
-            # choose the path with less angle turned if the distance cost is the same
+    #     currentAngleCost = cell.angleCost
+    #     newAngleCost = parentCell.angleCost + self.computeAngleTurned(parentCell.parent,parentCell,cell)
+    #     if newPathCost < currentPathCost or (newPathCost == currentPathCost and newAngleCost < currentAngleCost):
+    #         # choose the path with less angle turned if the distance cost is the same
 
-            cell.parent = parentCell
-            cell.pathCost = newPathCost
-            cell.angleCost = newAngleCost
+    #         cell.parent = parentCell
+    #         cell.pathCost = newPathCost
+    #         cell.angleCost = newAngleCost
             
-            self.priorityQueue.sort(key=lambda c: c.getOverallCost()) 
+    #         self.priorityQueue.sort(key=lambda c: c.getOverallCost()) 
 
     def assignCellCosts(self, cell):
         # path =self.getPathEndingAtCell(cell)
