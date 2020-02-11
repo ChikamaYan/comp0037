@@ -21,7 +21,7 @@ class GeneralForwardSearchAlgorithm(PlannerBase):
          
         # Flag to store if the last plan was successful
         self.goalReached = None
-        self.maxQueueLen = 0
+
 
     # These methods manage the queue of cells to be visied.
     def pushCellOntoQueue(self, cell):
@@ -130,6 +130,9 @@ class GeneralForwardSearchAlgorithm(PlannerBase):
 
         # Reset the count
         self.numberOfCellsVisited = 0
+
+        # reset max queue len
+        self.maxQueueLen = 0
 
         # Indicates if we reached the goal or not
         self.goalReached = False
