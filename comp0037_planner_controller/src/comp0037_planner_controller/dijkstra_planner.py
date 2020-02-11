@@ -21,15 +21,16 @@ class DijkstraPlanner(CellBasedForwardSearch):
     def pushCellOntoQueue(self, cell):
         self.assignCellCosts(cell)
 
-        for i in range(len(self.priorityQueue)):
-            if self.priorityQueue[i].getOverallCost() > cell.getOverallCost():
-                self.priorityQueue.insert(i, cell)
-                # print("Cell costs are: " + str(map(lambda c:c.getOverallCost(),self.priorityQueue)))
-                # print("Cell distance costs are: " + str(map(lambda c:c.pathCost,self.priorityQueue)))
-                # print("Cell heuristics are: " + str(map(lambda c:c.heuristic,self.priorityQueue)))
-                # self.plannerDrawer.waitForKeyPress()
-                return
+        # for i in range(len(self.priorityQueue)):
+        #     if self.priorityQueue[i].getOverallCost() > cell.getOverallCost():
+        #         self.priorityQueue.insert(i, cell)
+        #         # print("Cell costs are: " + str(map(lambda c:c.getOverallCost(),self.priorityQueue)))
+        #         # print("Cell distance costs are: " + str(map(lambda c:c.pathCost,self.priorityQueue)))
+        #         # print("Cell heuristics are: " + str(map(lambda c:c.heuristic,self.priorityQueue)))
+        #         # self.plannerDrawer.waitForKeyPress()
+        #         return
         self.priorityQueue.append(cell)
+        self.priorityQueue.sort(key=lambda c: c.getOverallCost())
 
 
     # Check the queue size is zero
@@ -47,7 +48,7 @@ class DijkstraPlanner(CellBasedForwardSearch):
 
         currentAngleCost = cell.angleCost
         newAngleCost = parentCell.angleCost + self.computeAngleTurned(parentCell.parent,parentCell,cell)
-        if newPathCost < currentPathCost:
+        if newPathCost <= currentPathCost:
         # a different version that chooses the path with less angle turned if the distance cost is the same
         # if newPathCost < currentPathCost or (newPathCost == currentPathCost and newAngleCost < currentAngleCost):
             cell.parent = parentCell
