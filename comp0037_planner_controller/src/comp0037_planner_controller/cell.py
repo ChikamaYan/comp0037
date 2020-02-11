@@ -37,7 +37,7 @@ class Cell(object):
         self.pathCost = float("inf")
 
         self.heuristic = 0
-        self.angel = 0
+        self.angleCost = 0
 
     def getOverallCost(self):
         return self.pathCost + self.heuristic
