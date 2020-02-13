@@ -7,7 +7,6 @@ from collections import deque
 from planned_path import PlannedPath
 import operator
 from math import *
-import rospy
 
 
 class DijkstraPlanner(CellBasedForwardSearch):
@@ -22,15 +21,14 @@ class DijkstraPlanner(CellBasedForwardSearch):
         self.assignCellCosts(cell)
 
         for i in range(len(self.priorityQueue)):
-            if self.priorityQueue[i].getOverallCost() > cell.getOverallCost():
+            if self.priorityQueue[i].pathCost > cell.pathCost:
                 self.priorityQueue.insert(i, cell)
                 # print("Cell costs are: " + str(map(lambda c:c.getOverallCost(),self.priorityQueue)))
                 # print("Cell distance costs are: " + str(map(lambda c:c.pathCost,self.priorityQueue)))
-                # print("Cell heuristics are: " + str(map(lambda c:c.heuristic,self.priorityQueue)))
                 # self.plannerDrawer.waitForKeyPress()
                 return
         self.priorityQueue.append(cell)
-        # self.priorityQueue.sort(key=lambda c: c.getOverallCost())
+        # self.priorityQueue.sort(key=lambda c: c.pathCost)
 
 
     # Check the queue size is zero
@@ -56,7 +54,7 @@ class DijkstraPlanner(CellBasedForwardSearch):
             cell.angleCost = newAngleCost
             
             # can just pop the cell out and re-insert to ensure best performance
-            self.priorityQueue.sort(key=lambda c: c.getOverallCost())
+            self.priorityQueue.sort(key=lambda c: c.pathCost)
 
     def getQueueLen(self):
         return len(self.priorityQueue)
