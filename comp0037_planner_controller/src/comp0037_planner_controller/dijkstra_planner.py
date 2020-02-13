@@ -46,14 +46,23 @@ class DijkstraPlanner(CellBasedForwardSearch):
 
         currentAngleCost = cell.angleCost
         newAngleCost = parentCell.angleCost + self.computeAngleTurned(parentCell.parent,parentCell,cell)
-        if newPathCost <= currentPathCost:
+        # if newPathCost <= currentPathCost:
         # a different version that chooses the path with less angle turned if the distance cost is the same
-        # if newPathCost < currentPathCost or (newPathCost == currentPathCost and newAngleCost < currentAngleCost):
+        if newPathCost < currentPathCost or (newPathCost == currentPathCost and newAngleCost < currentAngleCost):
             cell.parent = parentCell
             cell.pathCost = newPathCost
             cell.angleCost = newAngleCost
             
             # can just pop the cell out and re-insert to ensure best performance
+            # doesn't work -- even slower
+            # self.priorityQueue.remove(cell)
+            # if self.isQueueEmpty():
+            #     self.priorityQueue.append(cell)
+            # else:
+            #     for i in range(len(self.priorityQueue)):
+            #         if self.priorityQueue[i].pathCost > cell.pathCost:
+            #             self.priorityQueue.insert(i, cell)
+
             self.priorityQueue.sort(key=lambda c: c.pathCost)
 
     def getQueueLen(self):
