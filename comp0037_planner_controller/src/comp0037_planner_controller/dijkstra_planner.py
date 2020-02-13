@@ -21,16 +21,16 @@ class DijkstraPlanner(CellBasedForwardSearch):
     def pushCellOntoQueue(self, cell):
         self.assignCellCosts(cell)
 
-        # for i in range(len(self.priorityQueue)):
-        #     if self.priorityQueue[i].getOverallCost() > cell.getOverallCost():
-        #         self.priorityQueue.insert(i, cell)
-        #         # print("Cell costs are: " + str(map(lambda c:c.getOverallCost(),self.priorityQueue)))
-        #         # print("Cell distance costs are: " + str(map(lambda c:c.pathCost,self.priorityQueue)))
-        #         # print("Cell heuristics are: " + str(map(lambda c:c.heuristic,self.priorityQueue)))
-        #         # self.plannerDrawer.waitForKeyPress()
-        #         return
+        for i in range(len(self.priorityQueue)):
+            if self.priorityQueue[i].getOverallCost() > cell.getOverallCost():
+                self.priorityQueue.insert(i, cell)
+                # print("Cell costs are: " + str(map(lambda c:c.getOverallCost(),self.priorityQueue)))
+                # print("Cell distance costs are: " + str(map(lambda c:c.pathCost,self.priorityQueue)))
+                # print("Cell heuristics are: " + str(map(lambda c:c.heuristic,self.priorityQueue)))
+                # self.plannerDrawer.waitForKeyPress()
+                return
         self.priorityQueue.append(cell)
-        self.priorityQueue.sort(key=lambda c: c.getOverallCost())
+        # self.priorityQueue.sort(key=lambda c: c.getOverallCost())
 
 
     # Check the queue size is zero
@@ -55,6 +55,7 @@ class DijkstraPlanner(CellBasedForwardSearch):
             cell.pathCost = newPathCost
             cell.angleCost = newAngleCost
             
+            # can just pop the cell out and re-insert to ensure best performance
             self.priorityQueue.sort(key=lambda c: c.getOverallCost())
 
     def getQueueLen(self):
