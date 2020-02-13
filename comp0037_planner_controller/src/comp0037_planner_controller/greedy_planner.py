@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from cell_based_forward_search import CellBasedForwardSearch
-from collections import deque
+from Queue import PriorityQueue
 import math
 
 # This class implements the greedy planner using Euclidean distance to the goal to order
@@ -11,18 +11,13 @@ class GreedyPlanner(CellBasedForwardSearch):
     # Construct the new planner object
     def __init__(self, title, occupancyGrid):
         CellBasedForwardSearch.__init__(self, title, occupancyGrid)
-        self.priorityQueue = list()
+        self.priorityQueue = PriorityQueue
 
     # Push cell to queue according to Euclidean distance order. Leftmost is the smallest
     def pushCellOntoQueue(self, cell):
-        cell.pathCost = self.computeHeuristic(cell)
-
-        for i in range(len(self.priorityQueue)):
-            if self.priorityQueue[i].pathCost > cell.pathCost:
-                self.priorityQueue.insert(i,cell)
-                return
+        cell.heuristic = self.computeHeuristic(cell)
                 
-        self.priorityQueue.append(cell)
+        self.priorityQueue.put((cell.heuristic,cell))
 
     # Check the queue size is zero
     def isQueueEmpty(self):
@@ -30,7 +25,7 @@ class GreedyPlanner(CellBasedForwardSearch):
 
     # Pull the cell with least Euclidean distance
     def popCellFromQueue(self):
-        cell = self.priorityQueue.pop(0)
+        cell = self.priorityQueue.get()
         return cell
 
     def resolveDuplicate(self, cell, parentCell):
