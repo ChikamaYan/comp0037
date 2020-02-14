@@ -1,12 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from cell_based_forward_search import CellBasedForwardSearch
-from search_grid import SearchGrid
-from cell import *
-from collections import deque
-from planned_path import PlannedPath
-import operator
-from math import *
 
 
 class DijkstraPlanner(CellBasedForwardSearch):
