@@ -40,7 +40,7 @@ class DijkstraPlanner(CellBasedForwardSearch):
 
         currentAngleCost = cell.angleCost
         newAngleCost = parentCell.angleCost + self.computeAngleTurned(parentCell.parent,parentCell,cell)
-        # if newPathCost <= currentPathCost:
+        # if newPathCost < currentPathCost:
         # a different version that chooses the path with less angle turned if the distance cost is the same
         if newPathCost < currentPathCost or (newPathCost == currentPathCost and newAngleCost < currentAngleCost):
             cell.parent = parentCell
