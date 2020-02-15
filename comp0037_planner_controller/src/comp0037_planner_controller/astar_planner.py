@@ -2,11 +2,7 @@
 
 from dijkstra_planner import DijkstraPlanner
 from search_grid import SearchGrid
-from cell import *
-from collections import deque
-from planned_path import PlannedPath
 import math
-import rospy
 
 
 class AstarPlanner(DijkstraPlanner):
