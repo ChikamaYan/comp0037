@@ -11,7 +11,7 @@ import rospy
 
 class AstarPlanner(DijkstraPlanner):
 
-    def __init__(self, title, occupancyGrid, heuristic="constant"):
+    def __init__(self, title, occupancyGrid, heuristic="squared_euclidean"):
         DijkstraPlanner.__init__(self, title, occupancyGrid)
         self.heuristic = heuristic
 
@@ -21,6 +21,9 @@ class AstarPlanner(DijkstraPlanner):
 
         if self.heuristic == "euclidean":
             return math.sqrt((cell.coords[0] - self.goal.coords[0])**2 + (cell.coords[1] - self.goal.coords[1])**2)
+
+        if self.heuristic == "squared_euclidean":
+            return (cell.coords[0] - self.goal.coords[0])**2 + (cell.coords[1] - self.goal.coords[1])**2
 
         k_coords = cell.coords
         G_coords = self.goal.coords
