@@ -11,7 +11,7 @@ import rospy
 
 class AstarPlanner(DijkstraPlanner):
 
-    def __init__(self, title, occupancyGrid, heuristic="manhattan"):
+    def __init__(self, title, occupancyGrid, heuristic="constant"):
         DijkstraPlanner.__init__(self, title, occupancyGrid)
         self.heuristic = heuristic
 
@@ -48,8 +48,8 @@ class AstarPlanner(DijkstraPlanner):
 
     def resolveDuplicate(self, cell, parentCell):
         currentPathCost = cell.pathCost
-        newPathCost = parentCell.pathCost - self.computeHeuristic(parentCell)+ \
-            self.computeLStageAdditiveCost(parentCell, cell) + self.computeHeuristic(cell)
+        newPathCost = parentCell.pathCost + \
+            self.computeLStageAdditiveCost(parentCell, cell)
 
         currentAngleCost = cell.angleCost
         newAngleCost = parentCell.angleCost + self.computeAngleTurned(parentCell.parent,parentCell,cell)
