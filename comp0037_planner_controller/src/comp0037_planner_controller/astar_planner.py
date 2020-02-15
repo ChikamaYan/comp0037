@@ -7,33 +7,37 @@ import math
 
 class AstarPlanner(DijkstraPlanner):
 
-    def __init__(self, title, occupancyGrid, heuristic="squared_euclidean"):
+    def __init__(self, title, occupancyGrid, heuristic="manhattan", heuristicWeight=1):
         DijkstraPlanner.__init__(self, title, occupancyGrid)
         self.heuristic = heuristic
+        self.heuristicWeight = heuristicWeight
 
     def computeHeuristic(self, cell):
-        if self.heuristic == "constant":
-            return 10
-
-        if self.heuristic == "euclidean":
-            return math.sqrt((cell.coords[0] - self.goal.coords[0])**2 + (cell.coords[1] - self.goal.coords[1])**2)
-
-        if self.heuristic == "squared_euclidean":
-            return (cell.coords[0] - self.goal.coords[0])**2 + (cell.coords[1] - self.goal.coords[1])**2
+        heuristic = 0
 
         k_coords = cell.coords
         G_coords = self.goal.coords
-        if self.heuristic == "octile":
-            result = max(abs(k_coords[0]-G_coords[0]), abs(k_coords[1]-G_coords[1]))\
+        if self.heuristic == "constant":
+            heuristic = 10
+
+        elif self.heuristic == "euclidean":
+            heuristic =  math.sqrt((cell.coords[0] - self.goal.coords[0])**2 + (cell.coords[1] - self.goal.coords[1])**2)
+
+        elif self.heuristic == "squared_euclidean":
+            heuristic = (cell.coords[0] - self.goal.coords[0])**2 + (cell.coords[1] - self.goal.coords[1])**2
+
+        elif self.heuristic == "octile":
+            heuristic = max(abs(k_coords[0]-G_coords[0]), abs(k_coords[1]-G_coords[1]))\
                 + (math.sqrt(2)-1) * \
                 min(abs(k_coords[0]-G_coords[0]), abs(k_coords[1]-G_coords[1]))
-            return result
 
-        if self.heuristic == "manhattan":
-            return abs(k_coords[0]-G_coords[0])+abs(k_coords[1]-G_coords[1])
-
-        print("ERROR: heuristic not defined")
-        return None
+        elif self.heuristic == "manhattan":
+            heuristic = abs(k_coords[0]-G_coords[0])+abs(k_coords[1]-G_coords[1])
+        else:
+            print("ERROR: heuristic not defined")
+            return None
+        
+        return heuristic * self.heuristicWeight
 
     def pushCellOntoQueue(self, cell):
         self.assignCellCosts(cell)
