@@ -63,7 +63,7 @@ class GeneralForwardSearchAlgorithm(PlannerBase):
         cell.label = CellLabel.DEAD
     
     # Handle the case that a cell has been visited already.
-    def resolveDuplicate(self, cell):
+    def resolveDuplicate(self, cell, parentCell):
         raise NotImplementedError()
     
     # Compute the additive cost of performing a step from the parent to the
