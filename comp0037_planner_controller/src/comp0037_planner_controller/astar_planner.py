@@ -50,9 +50,27 @@ class AstarPlanner(DijkstraPlanner):
 
 
     def resolveDuplicate(self, cell, parentCell):
+        self.assignCellCosts(cell)
+        # re-assigning cost is needed to avoid infinite loop
         currentPathCost = cell.pathCost
         newPathCost = parentCell.pathCost + \
             self.computeLStageAdditiveCost(parentCell, cell)
+
+        # if (cell.coords == (56,18) and parentCell.coords == (55,19)):
+        #     print("current cell {}'s cost is {}".format(cell.coords,currentPathCost))
+        #     print("new cost via {} is {}".format(parentCell.coords,newPathCost))
+
+        #     print(cell.parent.coords)
+        #     print(cell.parent.parent.coords)
+        #     print(parentCell.parent.coords)
+        #     print(parentCell.parent.parent.coords)
+
+        #     self.plannerDrawer.waitForKeyPress()
+
+        #     print("current path is:")
+        #     self.extractPathEndingAtCell(cell,"yellow")
+        #     print("new path is:")
+        #     self.extractPathEndingAtCell(parentCell,"yellow")
 
         currentAngleCost = cell.angleCost
         newAngleCost = parentCell.angleCost + self.computeAngleTurned(parentCell.parent,parentCell,cell)
