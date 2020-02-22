@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from dijkstra_planner import DijkstraPlanner
-from search_grid import SearchGrid
-from cell import CellLabel
 import math
 import copy
 

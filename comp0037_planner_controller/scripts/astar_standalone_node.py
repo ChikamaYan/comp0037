@@ -16,7 +16,7 @@ occupancyGrid = mapGetter.getMapFromServer()
 start = rospy.get_param("start_pose")
 goal = rospy.get_param("goal_pose")
 
-planner = AstarPlanner('astar Search', occupancyGrid)
+planner = AstarPlanner('astar Search', occupancyGrid, 'dijkstra', 0.999)
 
 planner.setRunInteractively(True)
 
