@@ -3,12 +3,15 @@
 from dijkstra_planner import DijkstraPlanner
 from search_grid import SearchGrid
 import math
+import copy
 
 
 class AstarPlanner(DijkstraPlanner):
 
     def __init__(self, title, occupancyGrid, heuristic="squared_euclidean", heuristicWeight=0.01):
         DijkstraPlanner.__init__(self, title, occupancyGrid)
+        self.title = title
+        self.occupancyGrid = occupancyGrid
         self.heuristic = heuristic
         self.heuristicWeight = heuristicWeight
 
@@ -33,6 +36,18 @@ class AstarPlanner(DijkstraPlanner):
 
         elif self.heuristic == "manhattan":
             heuristic = abs(k_coords[0]-G_coords[0])+abs(k_coords[1]-G_coords[1])
+
+        elif self.heuristic == "dijkstra":
+            copygrid = [[copy.deepcopy(self.occupancyGrid.getCell(x, y)) for y in range(self.occupancyGrid.getHeightInCells())]
+                        for x in range(self.occupancyGrid.getWidthInCells())]
+            dj = DijkstraPlanner(self.title, self.occupancyGrid)
+            dj.setShowGraphics(False)
+            dj.search(G_coords, k_coords)
+            heuristic = dj.extractPathToGoal().travelCost
+            for x in range(self.occupancyGrid.getWidthInCells()):
+                for y in range(self.occupancyGrid.getHeightInCells()):
+                    self.occupancyGrid.setCell(x, y, copygrid[x][y])
+
         else:
             print("ERROR: heuristic not defined")
             return None
