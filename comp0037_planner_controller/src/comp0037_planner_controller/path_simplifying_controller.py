@@ -9,17 +9,20 @@ from nav_msgs.msg import Odometry
 from math import pow,atan2,sqrt,pi
 from planned_path import PlannedPath
 import time
-import math
+from math import degrees, fabs
 
 
 class PathSimplifyingController(Move2GoalController):
-    def __init__(self, occupancyGrid):
+    def __init__(self, occupancyGrid, optimise=True):
         Move2GoalController.__init__(self, occupancyGrid)
         self.totalDistance = 0
         self.totalAngle = 0
         self.totalTime = 0
+        self.totalPlannedCost = 0
+        self.totalPlannedAngle = 0
         self.pose = None
         self.plannerDrawer = None
+        self.optimise = optimise
 
     def odometryCallback(self, odometry):
         odometryPose = odometry.pose.pose
@@ -34,7 +37,8 @@ class PathSimplifyingController(Move2GoalController):
             self.pose.theta = 2 * atan2(orientation.z, orientation.w)
 
         self.totalDistance += sqrt((position.x - self.pose.x) ** 2 + (position.y - self.pose.y) ** 2)
-        self.totalAngle += math.fabs(self.shortestAngularDistance(self.pose.theta, 2 * atan2(orientation.z, orientation.w))) / math.pi * 180
+        self.totalAngle += degrees(fabs(self.shortestAngularDistance(
+                            self.pose.theta, 2 * atan2(orientation.z, orientation.w))))
         # print "Distance {0:.4f}, angle {1:.4f}, time {2:4f}".format(self.totalDistance, self.totalAngle, self.totalTime)
         position = odometryPose.position
         orientation = odometryPose.orientation
@@ -43,14 +47,46 @@ class PathSimplifyingController(Move2GoalController):
         self.pose.y = position.y
         self.pose.theta = 2 * atan2(orientation.z, orientation.w)
 
+    def simplifyPath(self, path):
+        newPath = PlannedPath()
+        newPath.goalReached = path.goalReached
+        newPath.travelCost = path.travelCost
+        newPath.angleTurned = path.angleTurned
+
+        newPath.waypoints.append(path.waypoints[0])
+        newPath.numberOfWaypoints = 1
+        for i in range(1, len(path.waypoints) - 1):
+            coord1 = path.waypoints[i - 1].coords
+            coord2 = path.waypoints[i].coords
+            coord3 = path.waypoints[i + 1].coords
+            # print("{} {} {}".format(coord1, coord2, coord3))
+            if coord3[0] - coord2[0] != coord2[0] - coord1[0] or coord3[1] - coord2[1] != coord2[1] - coord1[1]:
+                newPath.waypoints.append(path.waypoints[i])
+                newPath.numberOfWaypoints += 1
+                # print "Yes"
+
+        newPath.waypoints.append(path.waypoints[len(path.waypoints) - 1])
+        newPath.numberOfWaypoints += 1
+        # print "The following is the new path:"
+        # for cell in newPath.waypoints:
+        #     print cell.coords
+        # print newPath.numberOfWaypoints
+        # rospy.sleep(10)
+        # self.plannerDrawer.flushAndUpdateWindow()
+        # rospy.sleep(10000)
+        return newPath
+
     def drivePathToGoal(self, path, goalOrientation, plannerDrawer):
         self.plannerDrawer = plannerDrawer
         rospy.loginfo('Driving path to goal with ' + str(len(path.waypoints)) + ' waypoint(s)')
 
-        for waypointNumber in range(0, len(path.waypoints)):
-            cell = path.waypoints[waypointNumber]
+        simplerPath = self.simplifyPath(path) if self.optimise else path
+        for cell in simplerPath.waypoints:
+            print cell.coords
+        print simplerPath.numberOfWaypoints
+        for cell in simplerPath.waypoints:
             waypoint = self.occupancyGrid.getWorldCoordinatesFromCellCoordinates(cell.coords)
-            rospy.loginfo("Driving to waypoint (%f, %f)", waypoint[0], waypoint[1])
+            # rospy.loginfo("Driving to waypoint (%f, %f)", waypoint[0], waypoint[1])
             self.driveToWaypoint(waypoint)
             # Handle ^C
             if rospy.is_shutdown() is True:
@@ -61,6 +97,11 @@ class PathSimplifyingController(Move2GoalController):
         # Finish off by rotating the robot to the final configuration
         if rospy.is_shutdown() is False:
             self.rotateToGoalOrientation(goalOrientation)
+
+        self.totalPlannedCost += path.travelCost
+        self.totalPlannedAngle += path.angleTurned
+        print "Planned cost {0:4f}, angle{1:4f}".format(self.totalPlannedCost, self.totalPlannedAngle)
+        print "Distance {0:.4f}, angle {1:.4f}, time {2:4f}".format(self.totalDistance, self.totalAngle, self.totalTime)
 
     def driveToWaypoint(self, waypoint):
         vel_msg = Twist()
@@ -73,7 +114,7 @@ class PathSimplifyingController(Move2GoalController):
         prevTime = rospy.get_time()
         while (distanceError >= self.distanceErrorTolerance) & (not rospy.is_shutdown()):
             # print("Distance Error: {}\nAngular Error: {}".format(distanceError, angleError))
-            if math.fabs(angleError) < self.driveAngleErrorTolerance:
+            if fabs(angleError) < self.driveAngleErrorTolerance:
                 vel_msg.linear.x = max(0.0, min(self.distanceErrorGain * distanceError, 10.0))
                 vel_msg.linear.y = 0
                 vel_msg.linear.z = 0
