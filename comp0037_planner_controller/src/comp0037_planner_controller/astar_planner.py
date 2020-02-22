@@ -2,16 +2,15 @@
 
 from dijkstra_planner import DijkstraPlanner
 from search_grid import SearchGrid
+from cell import CellLabel
 import math
 import copy
 
 
 class AstarPlanner(DijkstraPlanner):
 
-    def __init__(self, title, occupancyGrid, heuristic="squared_euclidean", heuristicWeight=0.01):
+    def __init__(self, title, occupancyGrid, heuristic="dijkstra", heuristicWeight=1.0):
         DijkstraPlanner.__init__(self, title, occupancyGrid)
-        self.title = title
-        self.occupancyGrid = occupancyGrid
         self.heuristic = heuristic
         self.heuristicWeight = heuristicWeight
 
@@ -38,15 +37,20 @@ class AstarPlanner(DijkstraPlanner):
             heuristic = abs(k_coords[0]-G_coords[0])+abs(k_coords[1]-G_coords[1])
 
         elif self.heuristic == "dijkstra":
-            copygrid = [[copy.deepcopy(self.occupancyGrid.getCell(x, y)) for y in range(self.occupancyGrid.getHeightInCells())]
-                        for x in range(self.occupancyGrid.getWidthInCells())]
-            dj = DijkstraPlanner(self.title, self.occupancyGrid)
-            dj.setShowGraphics(False)
-            dj.search(G_coords, k_coords)
-            heuristic = dj.extractPathToGoal().travelCost
-            for x in range(self.occupancyGrid.getWidthInCells()):
-                for y in range(self.occupancyGrid.getHeightInCells()):
-                    self.occupancyGrid.setCell(x, y, copygrid[x][y])
+            if cell == self.start and cell.heuristic == 0:
+                dj = DijkstraPlanner(self.title, copy.deepcopy(self.occupancyGrid))
+                dj.setShowGraphics(False)
+                dj.search(G_coords, k_coords)
+                for x in range(self.occupancyGrid.getWidthInCells()):
+                    for y in range(self.occupancyGrid.getHeightInCells()):
+                        c = dj.searchGrid.grid[x][y]
+                        s = self.searchGrid.grid[x][y]
+                        s.heuristic = c.pathCost if c.pathCost != 0 else 9999
+
+            if cell == self.goal:
+                heuristic = 0
+            else:
+                heuristic = cell.heuristic
 
         else:
             print("ERROR: heuristic not defined")
@@ -89,7 +93,8 @@ class AstarPlanner(DijkstraPlanner):
 
         currentAngleCost = cell.angleCost
         newAngleCost = parentCell.angleCost + self.computeAngleTurned(parentCell.parent,parentCell,cell)
-        if newPathCost < currentPathCost or (newPathCost == currentPathCost and newAngleCost < currentAngleCost):
+        if newPathCost < currentPathCost or (newPathCost == currentPathCost and newAngleCost < currentAngleCost)\
+                :
             # choose the path with less angle turned if the distance cost is the same
 
             cell.parent = parentCell
