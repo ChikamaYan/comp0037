@@ -81,9 +81,9 @@ class PathSimplifyingController(Move2GoalController):
         rospy.loginfo('Driving path to goal with ' + str(len(path.waypoints)) + ' waypoint(s)')
 
         simplerPath = self.simplifyPath(path) if self.optimise else path
-        for cell in simplerPath.waypoints:
-            print cell.coords
-        print simplerPath.numberOfWaypoints
+        # for cell in simplerPath.waypoints:
+        #     print cell.coords
+        # print simplerPath.numberOfWaypoints
         for cell in simplerPath.waypoints:
             waypoint = self.occupancyGrid.getWorldCoordinatesFromCellCoordinates(cell.coords)
             # rospy.loginfo("Driving to waypoint (%f, %f)", waypoint[0], waypoint[1])
@@ -100,8 +100,8 @@ class PathSimplifyingController(Move2GoalController):
 
         self.totalPlannedCost += path.travelCost
         self.totalPlannedAngle += path.angleTurned
-        print "Planned cost {0:4f}, angle{1:4f}".format(self.totalPlannedCost, self.totalPlannedAngle)
-        print "Distance {0:.4f}, angle {1:.4f}, time {2:4f}".format(self.totalDistance, self.totalAngle, self.totalTime)
+        print "Planned cost {0:.4f}, angle {1:.4f}".format(self.totalPlannedCost, self.totalPlannedAngle)
+        print "Distance {0:.4f}, angle {1:.4f}, drive time {2:.4f}".format(self.totalDistance, self.totalAngle, self.totalTime)
 
     def driveToWaypoint(self, waypoint):
         vel_msg = Twist()

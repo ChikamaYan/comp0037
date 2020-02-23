@@ -21,8 +21,6 @@ from comp0037_planner_controller.fifo_planner import FIFOPlanner
 from comp0037_planner_controller.astar_planner import AstarPlanner
 
 # The controller to drive the robot along the path
-from comp0037_planner_controller.move2goal_controller import Move2GoalController
-
 from comp0037_planner_controller.path_simplifying_controller import PathSimplifyingController
 
 # This class interfaces with the planner and the controller
@@ -34,6 +32,7 @@ class PlannerControllerNode(object):
         self.waitForGoal =  threading.Condition()
         self.waitForDriveCompleted =  threading.Condition()
         self.goal = None
+        self.timeForPlanning = 0
         pass
     
     def createOccupancyGridFromMapServer(self):
@@ -55,12 +54,12 @@ class PlannerControllerNode(object):
         self.occupancyGrid.expandObstaclesToAccountForCircularRobotOfRadius(0.2)
 
     def createPlanner(self):
-        self.planner = AstarPlanner('Astar', self.occupancyGrid, "manhattan", 1)
+        self.planner = AstarPlanner('Astar', self.occupancyGrid, "constant", 0)
         self.planner.setPauseTime(0)
         self.planner.windowHeightInPixels = rospy.get_param('maximum_window_height_in_pixels', 700)
         
     def createRobotController(self):
-        self.robotController = PathSimplifyingController(self.occupancyGrid, True)
+        self.robotController = PathSimplifyingController(self.occupancyGrid, False)
 
     def handleDriveToGoal(self, goal):
         # Report to the main loop that we have a new goal
@@ -99,6 +98,7 @@ class PlannerControllerNode(object):
         if rospy.is_shutdown() is True:
             return False
 
+        timeNow = rospy.get_time()
         # Get the plan
         goalReached = self.planner.search(startCellCoords, goalCellCoords)
 
@@ -114,7 +114,8 @@ class PlannerControllerNode(object):
         
         # Extract the path
         path = self.planner.extractPathToGoal()
-
+        self.timeForPlanning += rospy.get_time() - timeNow
+        print "Time for planning is {0:.4f}".format(self.timeForPlanning)
         # Now drive it
         self.robotController.drivePathToGoal(path, goal.theta, self.planner.getPlannerDrawer())
 
