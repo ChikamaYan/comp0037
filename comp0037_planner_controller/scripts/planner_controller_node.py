@@ -59,7 +59,7 @@ class PlannerControllerNode(object):
         self.planner.windowHeightInPixels = rospy.get_param('maximum_window_height_in_pixels', 700)
         
     def createRobotController(self):
-        self.robotController = PathSimplifyingController(self.occupancyGrid, False)
+        self.robotController = PathSimplifyingController(self.occupancyGrid, True)
 
     def handleDriveToGoal(self, goal):
         # Report to the main loop that we have a new goal

@@ -7,7 +7,7 @@ import copy
 
 class AstarPlanner(DijkstraPlanner):
 
-    def __init__(self, title, occupancyGrid, heuristic="dijkstra", heuristicWeight=1.0):
+    def __init__(self, title, occupancyGrid, heuristic="octile", heuristicWeight=1.0):
         DijkstraPlanner.__init__(self, title, occupancyGrid)
         self.heuristic = heuristic
         self.heuristicWeight = heuristicWeight

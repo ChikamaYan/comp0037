@@ -78,12 +78,12 @@ class PathSimplifyingController(Move2GoalController):
 
     def drivePathToGoal(self, path, goalOrientation, plannerDrawer):
         self.plannerDrawer = plannerDrawer
-        rospy.loginfo('Driving path to goal with ' + str(len(path.waypoints)) + ' waypoint(s)')
 
         simplerPath = self.simplifyPath(path) if self.optimise else path
         # for cell in simplerPath.waypoints:
         #     print cell.coords
         # print simplerPath.numberOfWaypoints
+        rospy.loginfo('Driving path to goal with ' + str(simplerPath.numberOfWaypoints) + ' waypoint(s)')
         for cell in simplerPath.waypoints:
             waypoint = self.occupancyGrid.getWorldCoordinatesFromCellCoordinates(cell.coords)
             # rospy.loginfo("Driving to waypoint (%f, %f)", waypoint[0], waypoint[1])
