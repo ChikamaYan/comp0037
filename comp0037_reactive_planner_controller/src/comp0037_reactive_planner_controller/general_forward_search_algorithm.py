@@ -7,6 +7,7 @@ from collections import deque
 from cell import *
 from planned_path import PlannedPath
 from math import *
+import operator
 import rospy
 
 class GeneralForwardSearchAlgorithm(PlannerBase):
@@ -264,4 +265,19 @@ class GeneralForwardSearchAlgorithm(PlannerBase):
         path = self.extractPathEndingAtCell(self.goal, 'yellow')
        
         return path
+
+    def computeAngleTurned(self, cell1, cell2, cell3):
+        """
+        compute the angel turned when going cell1->cell2->cell3
+        """
+        if (cell1 is None or cell2 is None or cell3 is None):
+            return 0
+
+        currentDirection = list(map(operator.sub,cell3.coords,cell2.coords))
+        preDirection = list(map(operator.sub,cell2.coords,cell1.coords))
+        dotProduct = currentDirection[0] * preDirection[0] + currentDirection[1] * preDirection[1]
+        cosValue = dotProduct / float(sqrt((sum(map(lambda x:x*x,currentDirection)))) * float(sqrt(sum(map(lambda x:x*x,preDirection)))))
+        degree = degrees(acos(cosValue))
+
+        return round(degree)
             
