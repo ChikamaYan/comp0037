@@ -38,6 +38,16 @@ class ReactivePlannerController(PlannerControllerBase):
         # If the route is not viable any more, call
         # self.controller.stopDrivingToCurrentGoal()
 
+        THRESHOLD = 0.8
+
+        for waypoint in self.currentPlannedPath.waypoints:
+            prob = self.occupancyGrid.getCell(waypoint.coords[0],waypoint.coords[1])
+            # print("checking waypoint {} with prob {}".format(waypoint.coords,prob))
+            if prob >= THRESHOLD:
+                print("Waypoint {} is found to be obstructed!".format(waypoint.coords))
+                self.controller.stopDrivingToCurrentGoal()
+                return
+
         pass
     
     def driveToGoal(self, goal):
