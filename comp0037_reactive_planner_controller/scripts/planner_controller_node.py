@@ -27,6 +27,7 @@ from comp0037_reactive_planner_controller.reactive_planner_controller import Rea
 from comp0037_reactive_planner_controller.dijkstra_planner import DijkstraPlanner
 from comp0037_reactive_planner_controller.astar_planner import AstarPlanner
 from comp0037_reactive_planner_controller.move2goal_controller import Move2GoalController
+from comp0037_reactive_planner_controller.path_simplifying_controller import PathSimplifyingController
 
 # This class is the main node and orchestrates everything else
 
@@ -83,7 +84,9 @@ class PlannerControllerNode(object):
         self.planner.setRemoveGoalCellFromPathIfOccupied(removeGoalCellFromPathIfOccupied)
         
     def createRobotController(self):
-        self.robotController = Move2GoalController(self.occupancyGrid)
+        # self.robotController = Move2GoalController(self.occupancyGrid)
+        self.robotController = PathSimplifyingController(self.occupancyGrid)
+        
 
     def createPlannerController(self):
         if rospy.get_param('use_reactive_planner_controller', False) is True:

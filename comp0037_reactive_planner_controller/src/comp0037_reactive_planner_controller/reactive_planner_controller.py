@@ -44,7 +44,7 @@ class ReactivePlannerController(PlannerControllerBase):
             prob = self.occupancyGrid.getCell(waypoint.coords[0],waypoint.coords[1])
             # print("checking waypoint {} with prob {}".format(waypoint.coords,prob))
             if prob >= THRESHOLD:
-                print("Waypoint {} is found to be obstructed!".format(waypoint.coords))
+                print("Waypoint {} is found to be obstructed! Resetting path...".format(waypoint.coords))
                 self.controller.stopDrivingToCurrentGoal()
                 return
 

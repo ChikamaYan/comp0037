@@ -35,9 +35,11 @@ class ExplorerNode(ExplorerNodeBase):
                         if self.blackList[k] == candidate:
                             candidateGood = False
                             break
+                    return candidateGood, candidate
                     
                     if candidateGood is True:
                         d2 = candidate[0]**2+(candidate[1]-0.5*self.occupancyGrid.getHeightInCells())**2
+                        # ??
 
                         if (d2 < smallestD2):
                             destination = candidate
