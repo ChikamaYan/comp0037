@@ -223,16 +223,25 @@ class GeneralForwardSearchAlgorithm(PlannerBase):
             
         # Start at the goal and find the parent. Find the cost associated with the parent
         cell = pathEndCell.parent
-        path.travelCost = self.computeLStageAdditiveCost(pathEndCell.parent, pathEndCell)
-        
+        path.travelCost = self.computeLStageAdditiveCost(
+            pathEndCell.parent, pathEndCell)
+
+        last_cell = pathEndCell
+
         # Iterate back through and extract each parent in turn and add
         # it to the path. To work out the travel length along the
         # path, you'll also have to add self at self stage.
         while (cell is not None):
             path.waypoints.appendleft(cell)
-            path.travelCost = path.travelCost + self.computeLStageAdditiveCost(cell.parent, cell)
+            path.travelCost = path.travelCost + \
+                self.computeLStageAdditiveCost(cell.parent, cell)
+
+            # compute angel turned
+            path.angleTurned += self.computeAngleTurned(cell.parent,cell,last_cell)
+
+            last_cell = cell
             cell = cell.parent
-            
+
         # Update the stats on the size of the path
         path.numberOfWaypoints = len(path.waypoints)
 
@@ -243,6 +252,7 @@ class GeneralForwardSearchAlgorithm(PlannerBase):
 
         print "Path travel cost = " + str(path.travelCost)
         print "Path cardinality = " + str(path.numberOfWaypoints)
+        print ("Path angle turned = " + str(path.angleTurned))
         
         # Draw the path if requested
         if (self.showGraphics == True):
